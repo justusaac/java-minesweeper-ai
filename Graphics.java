@@ -213,7 +213,7 @@ public final class Graphics {
             super.open(loc);
             if (this.full_board[loc.row][loc.col].open) {
                 int n = this.full_board[loc.row][loc.col].number;
-                SwingUtilities.invokeLater(() -> {
+                Graphics.invokeSafe(() -> {
                     this.tiles[loc.row][loc.col].revealAs(n);
                 });
             }
@@ -226,7 +226,7 @@ public final class Graphics {
                 return;
             }
             if (!this.full_board[loc.row][loc.col].open) {
-                SwingUtilities.invokeLater(() -> {
+                Graphics.invokeSafe(() -> {
                     this.tiles[loc.row][loc.col].setFlag(this.full_board[loc.row][loc.col].flagged);
                 });
             }
@@ -252,7 +252,7 @@ public final class Graphics {
         public void lose() {
             Graphics.this.total_time = System.currentTimeMillis() - Graphics.this.start_time;
             Graphics.this.games_lost++;
-            SwingUtilities.invokeLater(() -> {
+            Graphics.invokeSafe(() -> {
                 for (int r = 0; r < this.height; r++) {
                     for (int c = 0; c < this.width; c++) {
                         this.tiles[r][c].revealEndgame(this.full_board[r][c]);
@@ -265,7 +265,7 @@ public final class Graphics {
         public void win() {
             Graphics.this.total_time = System.currentTimeMillis() - Graphics.this.start_time;
             Graphics.this.games_won++;
-            SwingUtilities.invokeLater(() -> {
+            Graphics.invokeSafe(() -> {
                 for (int r = 0; r < this.height; r++) {
                     for (int c = 0; c < this.width; c++) {
                         if (this.full_board[r][c].number == MINE && !this.full_board[r][c].flagged) {
@@ -281,7 +281,7 @@ public final class Graphics {
         public void setMinecount(int n) {
             super.setMinecount(n);
             final int length = Integer.toString(this.mines).length();
-            SwingUtilities.invokeLater(() -> {
+            Graphics.invokeSafe(() -> {
                 this.counter.setText(String.format("%0" + length + "d", n));
             });
         }
@@ -643,6 +643,23 @@ public final class Graphics {
         this.frame.repaint();
 
         this.initialize_ai((this.ai_class != null ? this.ai_class.getName() : ""));
+    }
+
+    // Human player will be playing from EDT whereas AI will be playing from a different thread.
+    // invokeAndWait slows the AI down a lot but with invokeLater the tiles will appear to be opened out of order which looks terrible.
+    private static void invokeSafe(Runnable r){
+        if(SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(r);
+        }
+        else {
+            try{
+                //Not allowed in EDT
+                SwingUtilities.invokeAndWait(r);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // Opens a graphics window when this class is run.
