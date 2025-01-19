@@ -246,6 +246,18 @@ public final class Graphics {
                     this.lose();
                 }
             }
+            //Auto-autoplay for video demo
+            /*
+            if((state==State.WIN || state==State.LOSE)){
+                new Thread(()->{
+                    try{Thread.sleep(1250);}catch(Exception e){}
+                    Graphics.this.newGame();
+                    try{Thread.sleep(100);}catch(Exception e){}
+                    Graphics.this.board.ai_play_thread();
+                }).start();
+            }
+            */
+
         }
 
         // Method to handle losing the game.
@@ -274,7 +286,12 @@ public final class Graphics {
                     }
                 }
             });
-            this.setMinecount(0);
+
+            //this.setMinecount(0);
+            Graphics.invokeSafe(() -> {
+                this.counter.setText("");
+                this.counter.setIcon(Graphics.normal_icon);
+            });
         }
 
         // Method to set the mine count.
