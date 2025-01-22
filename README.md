@@ -8,4 +8,5 @@ You can also run `minesweeper.StrategyTest` if you want to test out an AI strate
 
 To make a new AI strategy, it just needs to be a class implementing the `Agent` interface and should redefine the `newAgent` method. The most important fields of the `Game` object to help in making a good move are `board` and `minecount`.
 
-The strategy that I made that is in `LitStrategy.java` has a ~52% win rate on Expert difficulty.
+The strategy that I made that is in `LitStrategy.java` has a ~52% win rate on Expert difficulty. I made a video of it running:
+[![Demo video](https://img.youtube.com/vi/vigix0KgzKQ/0.jpg)](https://www.youtube.com/watch?v=vigix0KgzKQ "Demo video (on Youtube)")
